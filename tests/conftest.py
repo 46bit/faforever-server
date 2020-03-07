@@ -24,6 +24,7 @@ from server.geoip_service import GeoIpService
 from server.lobbyconnection import LobbyConnection
 from server.matchmaker import MatchmakerQueue
 from server.message_queue_service import MessageQueueService
+from server.party_service import PartyService
 from server.player_service import PlayerService
 from server.players import Player, PlayerState
 from server.rating import RatingType
@@ -227,6 +228,7 @@ async def rating_service(database, player_service):
 
     await service.shutdown()
 
+
 @pytest.fixture
 async def message_queue_service():
     service = MessageQueueService()
@@ -235,6 +237,7 @@ async def message_queue_service():
     yield service
 
     await service.shutdown()
+
 
 @pytest.fixture
 async def game_service(
@@ -258,6 +261,14 @@ async def geoip_service() -> GeoIpService:
     service.download_geoip_db = CoroutineMock()
     await service.initialize()
     return service
+
+
+@pytest.fixture
+async def party_service(game_service) -> PartyService:
+    service = PartyService(game_service)
+    await service.initialize()
+    yield service
+    await service.shutdown()
 
 
 @pytest.fixture(scope="session")

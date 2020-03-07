@@ -55,7 +55,6 @@ async def test_fetch_ratings_partially_nonexistent(player_factory, player_servic
     assert player.ratings[RatingType.LADDER_1V1] == (1500, 500)
 
 
-
 async def test_fetch_player_data_multiple_avatar(player_factory, player_service):
     player1 = player_factory(player_id=51)
     player2 = player_factory(player_id=52)
@@ -115,7 +114,7 @@ async def test_mark_dirty(player_factory, player_service):
     assert player_service.dirty_players == set()
 
 
-async def test_update_data(player_factory, player_service):
+async def test_update_data(player_service):
     await player_service.update_data()
 
     assert player_service.is_uniqueid_exempt(1) is True
