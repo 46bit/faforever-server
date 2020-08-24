@@ -31,6 +31,7 @@ from .db.models import (
 from .db.models import login as t_login
 from .decorators import timed, with_logger
 from .exceptions import AuthenticationError, ClientError
+from .factions import Faction
 from .game_service import GameService
 from .gameconnection import GameConnection
 from .games import FeaturedModType, GameState, VisibilityState
@@ -1094,11 +1095,15 @@ class LobbyConnection:
         await self.party_service.leave_party(self.player)
 
     async def command_set_party_factions(self, message):
-        factions = [bool(f) for f in message["factions"]]
-        if len(message["factions"]) != 4:
-            self.abort(f"{self.player.login} sent a wrongly formatted faction selection")
+        factions = set(Faction(i) for i in message["factions"])
 
-        self.party_service.set_factions(self.player, factions)
+        if not factions:
+            raise ClientError(
+                "You must select at least one faction.",
+                recoverable=True
+            )
+
+        self.party_service.set_factions(self.player, list(factions))
 
     async def send_warning(self, message: str, fatal: bool = False):
         """
